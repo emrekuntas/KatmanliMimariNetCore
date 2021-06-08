@@ -11,6 +11,7 @@ namespace DataAccess.Concrete.EntityFramework
     {
         public List<ProductDetailDto> GetProductDetails()
         {
+
             using NorthwindContext context = new NorthwindContext();
             var list = from p in context.Products
                        join c in context.Categories on
