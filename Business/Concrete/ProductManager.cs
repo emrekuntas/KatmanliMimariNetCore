@@ -9,25 +9,41 @@ using System.Collections.Generic;
 using System.Linq;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
+using Core.Utilities.Business;
 
 namespace Business.Concrete
 {
     public class ProductManager : IProductService
     {
         IProductDal _productDal;
+        ICategoryService _categoryService;
+    
 
-        public ProductManager(IProductDal productDal)
+        public ProductManager(IProductDal productDal,ICategoryService categoryService)
         {
             _productDal = productDal;
+            _categoryService = categoryService;
         }
 
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
-            if (!CheckCategoryCountOfProduct(product.CategoryId).Success) return new ErrorResult();
-            if (!CheckProductNameExist(product.ProductName).Success) return new ErrorResult();
+            IResult result = BusinessRules.Run(CheckCategoryCountOfProduct(product.CategoryId)
+                , CheckProductNameExist(product.ProductName), CheckCategoryCount());
+
+            if (result != null) return result; 
+            
             _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);
+        }
+        private IResult CheckCategoryCount()
+        {
+            var result = _categoryService.GetAll();
+            if (result.Data.Count> 15)
+            {
+                return new ErrorResult(Messages.CategorryLimitExceded);
+            }
+            return new SuccessResult();
         }
 
         private IResult CheckCategoryCountOfProduct(int categoryId)
@@ -48,6 +64,8 @@ namespace Business.Concrete
             }
             return new SuccessResult();
         }
+
+
 
         public IDataResult<List<Product>> GetAll()
         {
