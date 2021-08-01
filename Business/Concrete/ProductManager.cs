@@ -18,7 +18,6 @@ namespace Business.Concrete
         IProductDal _productDal;
         ICategoryService _categoryService;
     
-
         public ProductManager(IProductDal productDal,ICategoryService categoryService)
         {
             _productDal = productDal;
@@ -64,8 +63,6 @@ namespace Business.Concrete
             }
             return new SuccessResult();
         }
-
-
 
         public IDataResult<List<Product>> GetAll()
         {
