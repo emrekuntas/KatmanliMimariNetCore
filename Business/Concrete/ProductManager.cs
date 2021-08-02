@@ -25,7 +25,7 @@ namespace Business.Concrete
             _categoryService = categoryService;
         }
 
-        [SecuredOperation("admin")]
+        [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
@@ -51,7 +51,7 @@ namespace Business.Concrete
         {
             var count = _productDal.GetAll(p => p.CategoryId == categoryId).Count;
 
-            if (count >= 10)
+            if (count > 10)
                 return new ErrorResult(Messages.MaksimumProduct);
             return new SuccessResult();
         }
